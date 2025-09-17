@@ -185,6 +185,23 @@ impl Camera {
     .context(context)
   }
 
+  /// Captures a preview image into the given camera file
+  pub fn capture_preview_into(&self, camera_file: &CameraFile) -> Task<Result<()>> {
+    let camera = self.camera;
+    let context = self.context.inner;
+
+    let file = camera_file.clone(); // increases ref-count
+
+    unsafe {
+      Task::new(move || {
+        try_gp_internal!(gp_camera_capture_preview(*camera, *file.inner, *context)?);
+
+        Ok(())
+      })
+    }
+    .context(context)
+  }
+
   /// Get the camera's [`Abilities`]
   ///
   /// The abilities contain information about the driver used, permissions and camera model

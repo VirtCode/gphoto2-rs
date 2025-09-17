@@ -9,7 +9,7 @@ use crate::{
   task::{BackgroundPtr, Task},
   try_gp_internal, Context, Result,
 };
-use std::{borrow::Cow, fmt, fs, path::Path};
+use std::{borrow::Cow, fmt, fs, os::fd::RawFd, path::Path};
 
 /// Represents a path of a file on a camera
 pub struct CameraFilePath {
@@ -143,6 +143,12 @@ impl CameraFile {
 
     try_gp_internal!(gp_file_new_from_fd(&out camera_file_ptr, fd)?);
     Ok(Self { inner: BackgroundPtr(camera_file_ptr), is_from_disk: true })
+  }
+
+  /// Get a camera file pointing to the given file descriptor
+  pub fn new_fd(fd: RawFd) -> Result<Self>{
+    try_gp_internal!(gp_file_new_from_fd(&out camera_file_ptr, fd)?);
+    Ok(Self { inner: BackgroundPtr(camera_file_ptr), is_from_disk: false })
   }
 
   /// Get the data of the file
